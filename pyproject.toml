@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openapi-agent"
+version = "0.1.0"
+description = "Static-analysis agent that generates validated OpenAPI 3.1 documentation from Java and Python repositories"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "API Spec Agent Team" }]
+keywords = ["openapi", "static-analysis", "documentation", "fastapi", "spring"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Documentation",
+]
+
+dependencies = [
+    "pydantic>=2.7,<3",
+    "pydantic-settings>=2.3,<3",
+    "typer>=0.12,<1",
+    "rich>=13.7,<15",
+    "tenacity>=8.3,<10",
+    "ruamel.yaml>=0.18,<0.20",
+    "tree-sitter>=0.23,<0.27",
+    "tree-sitter-python>=0.23,<0.26",
+    "tree-sitter-java>=0.23,<0.24",
+    "libcst>=1.4,<2",
+    "docstring-parser>=0.16,<1",
+    "astroid>=3.2,<5",
+    "griffe>=1.0,<3",
+    "grimp>=3.4,<4",
+    "jsonschema>=4.22,<5",
+    "openapi-spec-validator>=0.7,<1",
+    "prance>=23.6",
+    "swagger-ui-bundle>=1.1,<2",
+]
+
+[project.optional-dependencies]
+llm = [
+    "google-genai>=1.0,<3",
+    "anthropic>=0.34",
+    "openai>=1.40,<3",
+]
+smoke = ["schemathesis>=3.36"]
+dev = [
+    "pytest>=8.2,<9",
+    "pytest-cov>=5,<8",
+    "google-genai>=1.0,<3",
+    "anthropic>=0.34",
+    "openai>=1.40,<3",
+]
+
+[project.scripts]
+openapi-agent = "openapi_agent.cli:app"
+
+# Framework adapters are discovered via entry points; third-party packages can
+# register additional adapters here without any core changes.
+[project.entry-points."openapi_agent.adapters"]
+fastapi = "openapi_agent.analysis.python.adapters.fastapi:FastAPIAdapter"
+flask = "openapi_agent.analysis.python.adapters.flask:FlaskAdapter"
+django = "openapi_agent.analysis.python.adapters.django:DjangoAdapter"
+spring-mvc = "openapi_agent.analysis.java.adapters.spring:SpringMvcAdapter"
+spring-webflux = "openapi_agent.analysis.java.adapters.spring:SpringWebFluxAdapter"
+jaxrs = "openapi_agent.analysis.java.adapters.jaxrs:JaxRsAdapter"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+openapi_agent = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["src/openapi_agent"]

@@ -1,0 +1,59 @@
+# openapi-agent configuration file.
+# Precedence: CLI flags > config.yaml > .env > built-in defaults.
+# Copy to config.yaml and adjust. All paths may be absolute or relative to CWD.
+
+project_root: ./target-repo
+
+output:
+  openapi_path: ./output/openapi.yaml
+  metadata_path: ./output/api_metadata.json
+  report_path: ./output/readiness_report.json
+  format: yaml            # yaml | json
+
+analysis:
+  # Force language/framework instead of auto-detection (normally leave unset).
+  # language: python       # python | java
+  # frameworks: [fastapi]  # subset of registered adapter names
+  # Only analyze specific services in a multi-service repo (service ids).
+  # services: [billing]
+  exclude_dirs:            # merged with built-in defaults (.venv, node_modules, target, build, ...)
+    - docs
+  include_migrations: false
+  call_graph_max_depth: 4
+  # Optional precision boosters (reserved; emit warning W006 when enabled —
+  # not implemented in this version, analysis uses the standard toolchain):
+  use_pyright: false       # future: `pyright --outputjson` inference booster
+  use_mypy: false          # future: mypy programmatic-API inference booster
+  scip_index: null         # future: SCIP index ingestion (scip-python / scip-java)
+  java:
+    sidecar_jar: tools/java-sidecar/target/openapi-agent-sidecar.jar
+    java_executable: java  # resolved on PATH; JVM absence degrades gracefully
+    sidecar_timeout_seconds: 120
+    use_spoon: false       # deep semantic analysis via Spoon (requires sidecar built with -Pspoon)
+
+llm:
+  provider: gemini         # gemini | anthropic | openai | none
+  # model: gemini-2.5-flash
+  timeout_seconds: 60
+  max_retries: 3
+  cache_dir: ./.llm_cache
+
+openapi:
+  title: My Service API
+  version: 1.0.0
+  servers:
+    - url: http://localhost:8080/api/v1
+      description: Local development
+    # - url: https://staging.example.com/api/v1
+    #   description: Staging
+  # contact / license blocks are copied verbatim into the info object if present.
+  # contact: { name: API Team, email: api@example.com }
+
+validation:
+  strict: false
+  redocly_lint: false      # shell out to `npx @redocly/cli lint` when Node is available
+  spectral_lint: false     # shell out to `npx @stoplight/spectral-cli lint`
+  schemathesis_smoke: false
+
+serve:
+  port: 8081

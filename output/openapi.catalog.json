@@ -1,0 +1,36 @@
+{
+  "services": [
+    {
+      "id": "services-budget-service",
+      "spec": "output/openapi.services-budget-service.yaml"
+    },
+    {
+      "id": "services-category-service",
+      "spec": "output/openapi.services-category-service.yaml"
+    },
+    {
+      "id": "services-expense-service",
+      "spec": "output/openapi.services-expense-service.yaml"
+    },
+    {
+      "id": "services-income-service",
+      "spec": "output/openapi.services-income-service.yaml"
+    },
+    {
+      "id": "services-notification-service",
+      "spec": "output/openapi.services-notification-service.yaml"
+    },
+    {
+      "id": "services-reporting-service",
+      "spec": "output/openapi.services-reporting-service.yaml"
+    },
+    {
+      "id": "services-savings-goal-service",
+      "spec": "output/openapi.services-savings-goal-service.yaml"
+    },
+    {
+      "id": "services-user-service",
+      "spec": "output/openapi.services-user-service.yaml"
+    }
+  ]
+}

@@ -1,0 +1,668 @@
+openapi: 3.1.0
+info:
+  title: Spendora Service API - income-service
+  version: 1.0.0
+  description: The income-service API provides endpoints for managing income and recurring income records. It supports full CRUD operations for income entries and allows for the retrieval, updating, and deletion of recurring income.
+  contact:
+    name: API Support
+    url: https://example.com/support
+  license:
+    name: Proprietary
+servers:
+- url: http://localhost:8080
+paths:
+  /api/v1/income:
+    get:
+      operationId: getIncome
+      tags:
+      - income
+      summary: List income records
+      parameters:
+      - name: categoryId
+        in: query
+        required: false
+        schema:
+          format: uuid
+          type: string
+        description: Filter by category ID.
+      - name: from
+        in: query
+        required: false
+        schema:
+          format: date
+          type: string
+        description: Filter records from a specific date.
+      - name: page
+        in: query
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        description: The page number for pagination.
+      - name: size
+        in: query
+        required: false
+        schema:
+          default: 20
+          format: int32
+          type: integer
+        description: The number of records per page.
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          default: date
+          type: string
+        description: The field to sort by.
+      - name: sortDir
+        in: query
+        required: false
+        schema:
+          default: desc
+          type: string
+        description: The direction of the sort.
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by source.
+      - name: to
+        in: query
+        required: false
+        schema:
+          format: date
+          type: string
+        description: Filter records to a specific date.
+      responses:
+        '200':
+          description: Returns a list of income records.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse_IncomeResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    post:
+      operationId: postIncome
+      tags:
+      - income
+      summary: Create a new income record
+      description: Submit an IncomeRequest to create a new income entry.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomeRequest'
+        required: true
+        description: Provide an IncomeRequest object in JSON format.
+      responses:
+        '201':
+          description: Income record created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomeResponse'
+          headers:
+            Location:
+              schema:
+                format: uri
+                type: string
+              required: true
+        '400':
+          description: Invalid arguments or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden ownership exception occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/income/{id}:
+    get:
+      operationId: getIncomeById
+      tags:
+      - income
+      summary: Retrieve income details by ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the income record.
+      responses:
+        '200':
+          description: The income details were successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomeResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access is forbidden due to ownership restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    put:
+      operationId: putIncomeById
+      tags:
+      - income
+      summary: Update income record
+      description: Update an existing income record using the provided IncomeRequest.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the income record.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomeRequest'
+        required: true
+        description: Provide the update details in an IncomeRequest object.
+      responses:
+        '200':
+          description: Income record updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomeResponse'
+        '400':
+          description: Invalid argument or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden ownership of the record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: deleteIncomeById
+      tags:
+      - income
+      summary: Delete the specified income record
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the income record.
+      responses:
+        '204':
+          description: The income record was successfully deleted.
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: ForbiddenOwnershipException occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/recurring-income:
+    get:
+      operationId: getRecurringIncome
+      tags:
+      - recurringincome
+      summary: List recurring income
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        description: The page number to retrieve.
+      - name: size
+        in: query
+        required: false
+        schema:
+          default: 20
+          format: int32
+          type: integer
+        description: The number of records per page.
+      responses:
+        '200':
+          description: Returns a list of recurring income records.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse_RecurringIncomeResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/recurring-income/{id}:
+    put:
+      operationId: putRecurringIncomeById
+      tags:
+      - recurring-income
+      summary: Edit a recurring income record
+      description: Update the details of an existing recurring income entry.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the recurring income record.
+      - name: scope
+        in: query
+        required: false
+        schema:
+          default: THIS
+          type: string
+        description: The scope to be used for the update.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomeRequest'
+        required: true
+        description: Provide the updated details using the IncomeRequest schema.
+      responses:
+        '200':
+          description: The recurring income record was successfully updated.
+        '400':
+          description: The request was invalid or failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access is forbidden due to ownership restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: deleteRecurringIncomeById
+      tags:
+      - recurring-income
+      summary: Delete a recurring income record
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the recurring income record.
+      - name: scope
+        in: query
+        required: false
+        schema:
+          default: THIS
+          type: string
+        description: The scope to apply to the deletion request.
+      responses:
+        '204':
+          description: The recurring income record was successfully deleted.
+        '400':
+          description: The request contained an illegal argument.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: The user does not have the required ownership permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+tags:
+- name: income
+- name: recurring-income
+- name: recurringincome
+components:
+  schemas:
+    ErrorResponse:
+      description: 'Uniform error envelope — API-3. Serializes exactly: timestamp, status, error, message, path, traceId. The {@code message} field MUST carry zero PII (CQ-13).'
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        traceId:
+          type: string
+      type: object
+    IncomeRequest:
+      description: Create/Edit Income request (contract §7 DTOs). {@code source} is the named origin of the Income (glossary "Source" — never "payer"/"origin"/"from"). {@code recurrence} is optional — present ⇒ recurring Income (spawns a RecurringIncome template).
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        categoryId:
+          format: uuid
+          type: string
+        date:
+          format: date
+          type: string
+        description:
+          type: string
+        recurrence:
+          $ref: '#/components/schemas/RecurrenceSpec'
+        source:
+          minLength: 1
+          type: string
+      required:
+      - amount
+      - categoryId
+      - date
+      - source
+      type: object
+    IncomeResponse:
+      description: Income representation (AL-4 — controllers expose this DTO, never the entity). {@code recurringIncomeId} is non-null on generated Occurrences.
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        categoryId:
+          format: uuid
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        date:
+          format: date
+          type: string
+        description:
+          type: string
+        incomeId:
+          format: uuid
+          type: string
+        recurringIncomeId:
+          format: uuid
+          type: string
+        source:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      type: object
+    MoneyDto:
+      description: Value object for monetary amounts. INR-only, scale-2, BigDecimal — never double/float (DB-5). Serializes amount as a JSON string "100.50" to avoid floating-point representation errors.
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+      type: object
+    PageResponse_IncomeResponse:
+      description: 'Uniform pagination envelope — API-2. Serializes exactly: content, page, size, totalElements, totalPages.'
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/IncomeResponse'
+          type: array
+        page:
+          format: int32
+          type: integer
+        size:
+          format: int32
+          type: integer
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      type: object
+    PageResponse_RecurringIncomeResponse:
+      description: 'Uniform pagination envelope — API-2. Serializes exactly: content, page, size, totalElements, totalPages.'
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/RecurringIncomeResponse'
+          type: array
+        page:
+          format: int32
+          type: integer
+        size:
+          format: int32
+          type: integer
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      type: object
+    RecurrencePattern:
+      description: T124 — income-service's OWN Recurrence Pattern value object (AL-3). Duplicated from the Recurring Expense pattern — deliberately NOT shared via shared-kernel.
+      enum:
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - YEARLY
+      type: string
+    RecurrenceSpec:
+      description: Presence of this block on an {@link IncomeRequest} marks the Income recurring and spawns a RecurringIncome template. At most one of endDate / maxOccurrences (RecurrenceBound); neither ⇒ indefinite.
+      properties:
+        anchorDate:
+          format: date
+          type: string
+        endDate:
+          format: date
+          type: string
+        frequency:
+          $ref: '#/components/schemas/RecurrencePattern'
+        maxOccurrences:
+          format: int32
+          type: integer
+      required:
+      - anchorDate
+      - frequency
+      type: object
+    RecurringIncomeResponse:
+      description: RecurringIncome template representation (AL-4 — DTO only).
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        anchorDate:
+          format: date
+          type: string
+        categoryId:
+          format: uuid
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        description:
+          type: string
+        endDate:
+          format: date
+          type: string
+        frequency:
+          type: string
+        generatedCount:
+          format: int32
+          type: integer
+        maxOccurrences:
+          format: int32
+          type: integer
+        nextRunDate:
+          format: date
+          type: string
+        recurringIncomeId:
+          format: uuid
+          type: string
+        source:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

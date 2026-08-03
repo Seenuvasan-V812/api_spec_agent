@@ -1,0 +1,500 @@
+openapi: 3.1.0
+info:
+  title: Spendora Service API - reporting-service
+  version: 1.0.0
+  description: The reporting-service API provides endpoints for accessing dashboard data and generating reports. It supports the retrieval of custom, monthly, and yearly reports. Additionally, it allows for the synchronous downloading of report artifacts.
+  contact:
+    name: API Support
+    url: https://example.com/support
+  license:
+    name: Proprietary
+servers:
+- url: http://localhost:8080
+paths:
+  /api/v1/dashboard:
+    get:
+      operationId: getDashboard
+      tags:
+      - dashboard
+      summary: Retrieve dashboard data
+      description: Provide the required month to retrieve dashboard data.
+      parameters:
+      - name: month
+        in: query
+        required: true
+        schema:
+          type: string
+        description: The month for which to retrieve dashboard data.
+      responses:
+        '200':
+          description: The request was successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardResponse'
+        '400':
+          description: An illegal argument was provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/reports/custom:
+    get:
+      operationId: getReportsCustom
+      tags:
+      - report
+      summary: Retrieve a custom report
+      description: Provide a date range to retrieve a custom report.
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          format: date
+          type: string
+        description: The start date for the report.
+      - name: to
+        in: query
+        required: true
+        schema:
+          format: date
+          type: string
+        description: The end date for the report.
+      responses:
+        '200':
+          description: The custom report was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '400':
+          description: The request contained invalid arguments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/reports/download:
+    get:
+      operationId: getReportsDownload
+      tags:
+      - report
+      summary: Stream the artefact synchronously to the servlet output stream
+      description: Validation for scope, format, and range occurs before streaming begins. This ensures a clean 400 error for invalid input without partial body transmission.
+      parameters:
+      - name: format
+        in: query
+        required: true
+        schema:
+          type: string
+        description: The format of the artefact.
+      - name: from
+        in: query
+        required: false
+        schema:
+          format: date
+          type: string
+        description: The starting range.
+      - name: month
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The month filter.
+      - name: scope
+        in: query
+        required: true
+        schema:
+          type: string
+        description: The scope of the artefact.
+      - name: to
+        in: query
+        required: false
+        schema:
+          format: date
+          type: string
+        description: The ending range.
+      - name: year
+        in: query
+        required: false
+        schema:
+          format: int32
+          type: integer
+        description: The year filter.
+      responses:
+        '200':
+          description: The artefact is successfully streamed.
+        '400':
+          description: The request contained invalid arguments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/reports/monthly:
+    get:
+      operationId: getReportsMonthly
+      tags:
+      - report
+      summary: Retrieve the monthly report
+      parameters:
+      - name: month
+        in: query
+        required: true
+        schema:
+          type: string
+        description: The month for the report.
+      responses:
+        '200':
+          description: Returns the monthly report.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/reports/yearly:
+    get:
+      operationId: getReportsYearly
+      tags:
+      - report
+      summary: Retrieve the yearly report
+      parameters:
+      - name: year
+        in: query
+        required: true
+        schema:
+          format: int32
+          type: integer
+        description: The year for which to retrieve the report.
+      responses:
+        '200':
+          description: The yearly report was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '400':
+          description: The request contained an illegal argument.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+tags:
+- name: dashboard
+- name: report
+components:
+  schemas:
+    BudgetAlert:
+      properties:
+        budgetId:
+          format: uuid
+          type: string
+        categoryId:
+          format: uuid
+          type: string
+        threshold:
+          type: string
+      type: object
+    CategorySlice:
+      properties:
+        categoryId:
+          format: uuid
+          type: string
+        categoryName:
+          type: string
+        percent:
+          type: number
+        total:
+          $ref: '#/components/schemas/MoneyDto'
+      type: object
+    DashboardResponse:
+      description: 'Dashboard read-model (contract §DTOs, REQ-DASH-001…006, REQ-GOAL-014). AL-4: DTO only. {@code categoryName} is null — reporting cannot resolve names without a cross-schema lookup (AL-1).'
+      properties:
+        budgetAlerts:
+          items:
+            $ref: '#/components/schemas/BudgetAlert'
+          type: array
+        categoryBreakdown:
+          items:
+            $ref: '#/components/schemas/CategorySlice'
+          type: array
+        incomeVsExpense:
+          items:
+            $ref: '#/components/schemas/IncomeVsExpensePoint'
+          type: array
+        month:
+          type: string
+        savingsGoals:
+          items:
+            $ref: '#/components/schemas/GoalSnapshot'
+          type: array
+        spendingTrend:
+          items:
+            $ref: '#/components/schemas/TrendPoint'
+          type: array
+        summary:
+          $ref: '#/components/schemas/Summary'
+        topCategories:
+          items:
+            $ref: '#/components/schemas/TopCategory'
+          type: array
+      type: object
+    DayWise:
+      properties:
+        date:
+          format: date
+          type: string
+        total:
+          $ref: '#/components/schemas/MoneyDto'
+      type: object
+    ErrorResponse:
+      description: 'Uniform error envelope — API-3. Serializes exactly: timestamp, status, error, message, path, traceId. The {@code message} field MUST carry zero PII (CQ-13).'
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        traceId:
+          type: string
+      type: object
+    GoalSnapshot:
+      properties:
+        name:
+          type: string
+        percentageAchieved:
+          type: number
+        savingsGoalId:
+          format: uuid
+          type: string
+        status:
+          type: string
+        targetAmount:
+          $ref: '#/components/schemas/MoneyDto'
+        totalContributed:
+          $ref: '#/components/schemas/MoneyDto'
+      type: object
+    IncomeVsExpensePoint:
+      properties:
+        expense:
+          $ref: '#/components/schemas/MoneyDto'
+        income:
+          $ref: '#/components/schemas/MoneyDto'
+        month:
+          type: string
+      type: object
+    MoneyDto:
+      description: Value object for monetary amounts. INR-only, scale-2, BigDecimal — never double/float (DB-5). Serializes amount as a JSON string "100.50" to avoid floating-point representation errors.
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+      type: object
+    PaymentMethodSlice:
+      properties:
+        paymentMethod:
+          type: string
+        percent:
+          type: number
+        total:
+          $ref: '#/components/schemas/MoneyDto'
+      type: object
+    Period:
+      properties:
+        from:
+          format: date
+          type: string
+        to:
+          format: date
+          type: string
+      type: object
+    ReportResponse:
+      description: 'Report read-model (contract §DTOs; REQ-RPT-001…004). AL-4: DTO only. {@code categoryName} is null — names require a cross-schema lookup that AL-1 prohibits.'
+      properties:
+        categoryBreakdown:
+          items:
+            $ref: '#/components/schemas/CategorySlice'
+          type: array
+        dayWiseSummary:
+          items:
+            $ref: '#/components/schemas/DayWise'
+          type: array
+        netSavings:
+          $ref: '#/components/schemas/MoneyDto'
+        paymentMethodBreakdown:
+          items:
+            $ref: '#/components/schemas/PaymentMethodSlice'
+          type: array
+        period:
+          $ref: '#/components/schemas/Period'
+        scope:
+          type: string
+        totalExpenses:
+          $ref: '#/components/schemas/MoneyDto'
+        totalIncome:
+          $ref: '#/components/schemas/MoneyDto'
+        transactions:
+          items:
+            $ref: '#/components/schemas/Transaction'
+          type: array
+      type: object
+    Summary:
+      properties:
+        activeBudgets:
+          items: {}
+          type: array
+        netSavings:
+          $ref: '#/components/schemas/MoneyDto'
+        savingsRate:
+          type: number
+        totalExpenses:
+          $ref: '#/components/schemas/MoneyDto'
+        totalIncome:
+          $ref: '#/components/schemas/MoneyDto'
+        transactionCount:
+          format: int32
+          type: integer
+      type: object
+    TopCategory:
+      properties:
+        categoryId:
+          format: uuid
+          type: string
+        categoryName:
+          type: string
+        total:
+          $ref: '#/components/schemas/MoneyDto'
+      type: object
+    Transaction:
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        categoryId:
+          format: uuid
+          type: string
+        date:
+          format: date
+          type: string
+        transactionId:
+          format: uuid
+          type: string
+        type:
+          type: string
+      type: object
+    TrendPoint:
+      properties:
+        month:
+          type: string
+        total:
+          $ref: '#/components/schemas/MoneyDto'
+      type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,1249 @@
+{
+  "$defs": {
+    "AnalysisWarning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "File"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "service_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Service Id"
+        },
+        "start_line": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Line"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "AnalysisWarning",
+      "type": "object"
+    },
+    "Condition": {
+      "additionalProperties": false,
+      "properties": {
+        "exception_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exception Type"
+        },
+        "expression": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expression"
+        },
+        "kind": {
+          "enum": [
+            "exception_handled",
+            "branch",
+            "early_return",
+            "annotation",
+            "default_success",
+            "content_negotiation"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "Condition",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        },
+        "level": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "reason_code": {
+          "enum": [
+            "declared_annotation",
+            "declared_type",
+            "inferred_return_flow",
+            "inferred_serializer",
+            "dynamic_type",
+            "unresolved_symbol",
+            "generated_code",
+            "conditional_conflict",
+            "framework_default",
+            "parse_error_partial",
+            "sidecar_unavailable"
+          ],
+          "title": "Reason Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "level",
+        "reason_code"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "CoverageMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Confidence Counts",
+          "type": "object"
+        },
+        "endpoints_total": {
+          "default": 0,
+          "title": "Endpoints Total",
+          "type": "integer"
+        },
+        "files_failed_parse": {
+          "default": 0,
+          "title": "Files Failed Parse",
+          "type": "integer"
+        },
+        "files_scanned": {
+          "default": 0,
+          "title": "Files Scanned",
+          "type": "integer"
+        },
+        "operations_needing_body": {
+          "default": 0,
+          "title": "Operations Needing Body",
+          "type": "integer"
+        },
+        "operations_total": {
+          "default": 0,
+          "title": "Operations Total",
+          "type": "integer"
+        },
+        "operations_with_request_schema": {
+          "default": 0,
+          "title": "Operations With Request Schema",
+          "type": "integer"
+        },
+        "operations_with_security": {
+          "default": 0,
+          "title": "Operations With Security",
+          "type": "integer"
+        },
+        "parameters_total": {
+          "default": 0,
+          "title": "Parameters Total",
+          "type": "integer"
+        },
+        "parameters_typed": {
+          "default": 0,
+          "title": "Parameters Typed",
+          "type": "integer"
+        },
+        "responses_total": {
+          "default": 0,
+          "title": "Responses Total",
+          "type": "integer"
+        },
+        "responses_with_schema": {
+          "default": 0,
+          "title": "Responses With Schema",
+          "type": "integer"
+        },
+        "unresolved_count": {
+          "default": 0,
+          "title": "Unresolved Count",
+          "type": "integer"
+        }
+      },
+      "title": "CoverageMetrics",
+      "type": "object"
+    },
+    "DependencyEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from_file": {
+          "title": "From File",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "import",
+            "include_router",
+            "url_include",
+            "component_scan",
+            "call",
+            "sidecar_resolved"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "to_file": {
+          "title": "To File",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_file",
+        "to_file",
+        "kind"
+      ],
+      "title": "DependencyEdge",
+      "type": "object"
+    },
+    "EncodingSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "content_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Type"
+        },
+        "headers": {
+          "additionalProperties": {
+            "$ref": "#/$defs/HeaderSpec"
+          },
+          "title": "Headers",
+          "type": "object"
+        }
+      },
+      "title": "EncodingSpec",
+      "type": "object"
+    },
+    "Endpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "operations": {
+          "items": {
+            "$ref": "#/$defs/Operation"
+          },
+          "title": "Operations",
+          "type": "array"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "raw_path": {
+          "title": "Raw Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "raw_path"
+      ],
+      "title": "Endpoint",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "file": {
+          "title": "File",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "decorator",
+            "annotation",
+            "signature",
+            "return_stmt",
+            "raise_stmt",
+            "class_def",
+            "field_def",
+            "call_site",
+            "assignment",
+            "config_file",
+            "url_conf",
+            "import",
+            "exception_handler",
+            "filter_chain"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "start_line": {
+          "minimum": 1,
+          "title": "Start Line",
+          "type": "integer"
+        },
+        "symbol": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Symbol"
+        }
+      },
+      "required": [
+        "file",
+        "start_line",
+        "end_line",
+        "kind"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "GeneratorInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "default": "openapi-agent",
+          "title": "Tool",
+          "type": "string"
+        },
+        "tool_version": {
+          "title": "Tool Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool_version"
+      ],
+      "title": "GeneratorInfo",
+      "type": "object"
+    },
+    "HeaderSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required"
+        },
+        "schema": {
+          "additionalProperties": true,
+          "title": "Schema",
+          "type": "object"
+        }
+      },
+      "required": [
+        "confidence",
+        "name"
+      ],
+      "title": "HeaderSpec",
+      "type": "object"
+    },
+    "LangTypeRef": {
+      "additionalProperties": false,
+      "properties": {
+        "language": {
+          "enum": [
+            "python",
+            "java"
+          ],
+          "title": "Language",
+          "type": "string"
+        },
+        "qualified_name": {
+          "title": "Qualified Name",
+          "type": "string"
+        },
+        "type_args": {
+          "items": {
+            "$ref": "#/$defs/LangTypeRef"
+          },
+          "title": "Type Args",
+          "type": "array"
+        }
+      },
+      "required": [
+        "language",
+        "qualified_name"
+      ],
+      "title": "LangTypeRef",
+      "type": "object"
+    },
+    "MediaTypeContract": {
+      "additionalProperties": false,
+      "properties": {
+        "encoding": {
+          "additionalProperties": {
+            "$ref": "#/$defs/EncodingSpec"
+          },
+          "title": "Encoding",
+          "type": "object"
+        },
+        "example": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Example"
+        },
+        "schema": {
+          "additionalProperties": true,
+          "title": "Schema",
+          "type": "object"
+        }
+      },
+      "title": "MediaTypeContract",
+      "type": "object"
+    },
+    "Operation": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "deprecated": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deprecated"
+        },
+        "description_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description Hint"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "handler": {
+          "title": "Handler",
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "get",
+            "put",
+            "post",
+            "delete",
+            "options",
+            "head",
+            "patch",
+            "trace"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "operation_id": {
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "parameters": {
+          "items": {
+            "$ref": "#/$defs/Parameter"
+          },
+          "title": "Parameters",
+          "type": "array"
+        },
+        "request_body": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RequestBody"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "responses": {
+          "items": {
+            "$ref": "#/$defs/ResponseVariant"
+          },
+          "title": "Responses",
+          "type": "array"
+        },
+        "security": {
+          "items": {
+            "$ref": "#/$defs/SecurityEvidence"
+          },
+          "title": "Security",
+          "type": "array"
+        },
+        "summary_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Summary Hint"
+        },
+        "tags_hint": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags Hint",
+          "type": "array"
+        }
+      },
+      "required": [
+        "confidence",
+        "method",
+        "operation_id",
+        "handler"
+      ],
+      "title": "Operation",
+      "type": "object"
+    },
+    "Parameter": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "default_repr": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default Repr"
+        },
+        "deprecated": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deprecated"
+        },
+        "description_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description Hint"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "explode": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Explode"
+        },
+        "location": {
+          "enum": [
+            "path",
+            "query",
+            "header",
+            "cookie"
+          ],
+          "title": "Location",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "required": {
+          "title": "Required",
+          "type": "boolean"
+        },
+        "schema": {
+          "additionalProperties": true,
+          "title": "Schema",
+          "type": "object"
+        },
+        "style": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Style"
+        }
+      },
+      "required": [
+        "confidence",
+        "name",
+        "location",
+        "required"
+      ],
+      "title": "Parameter",
+      "type": "object"
+    },
+    "RepoInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "analyzed_roots": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Analyzed Roots",
+          "type": "array"
+        },
+        "build_systems": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Build Systems",
+          "type": "array"
+        },
+        "languages": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Languages",
+          "type": "array"
+        },
+        "vcs_commit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vcs Commit"
+        }
+      },
+      "title": "RepoInfo",
+      "type": "object"
+    },
+    "RequestBody": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "content": {
+          "additionalProperties": {
+            "$ref": "#/$defs/MediaTypeContract"
+          },
+          "title": "Content",
+          "type": "object"
+        },
+        "description_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description Hint"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "confidence"
+      ],
+      "title": "RequestBody",
+      "type": "object"
+    },
+    "ResponseVariant": {
+      "additionalProperties": false,
+      "properties": {
+        "condition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Condition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "content": {
+          "additionalProperties": {
+            "$ref": "#/$defs/MediaTypeContract"
+          },
+          "title": "Content",
+          "type": "object"
+        },
+        "description_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description Hint"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "headers": {
+          "additionalProperties": {
+            "$ref": "#/$defs/HeaderSpec"
+          },
+          "title": "Headers",
+          "type": "object"
+        },
+        "origin": {
+          "enum": [
+            "annotation",
+            "return_type",
+            "raise_site",
+            "exception_handler",
+            "controller_advice",
+            "serializer",
+            "explicit_response_object",
+            "framework_default"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "variant_index": {
+          "default": 0,
+          "title": "Variant Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "confidence",
+        "status",
+        "origin"
+      ],
+      "title": "ResponseVariant",
+      "type": "object"
+    },
+    "SchemaEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "json_schema": {
+          "additionalProperties": true,
+          "title": "Json Schema",
+          "type": "object"
+        },
+        "lang_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LangTypeRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_id": {
+          "title": "Schema Id",
+          "type": "string"
+        },
+        "structural_hash": {
+          "title": "Structural Hash",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "used_by_services": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Used By Services",
+          "type": "array"
+        }
+      },
+      "required": [
+        "confidence",
+        "schema_id",
+        "title",
+        "structural_hash"
+      ],
+      "title": "SchemaEntry",
+      "type": "object"
+    },
+    "SchemaRegistry": {
+      "additionalProperties": false,
+      "properties": {
+        "schemas": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SchemaEntry"
+          },
+          "title": "Schemas",
+          "type": "object"
+        }
+      },
+      "title": "SchemaRegistry",
+      "type": "object"
+    },
+    "SecurityEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "mechanism": {
+          "enum": [
+            "decorator",
+            "dependency_injection",
+            "annotation",
+            "filter_chain_config",
+            "middleware",
+            "permission_class"
+          ],
+          "title": "Mechanism",
+          "type": "string"
+        },
+        "scheme_id": {
+          "title": "Scheme Id",
+          "type": "string"
+        },
+        "scopes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Scopes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "confidence",
+        "scheme_id",
+        "mechanism"
+      ],
+      "title": "SecurityEvidence",
+      "type": "object"
+    },
+    "SecuritySchemeDecl": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "http_bearer",
+            "http_basic",
+            "apikey_header",
+            "apikey_query",
+            "apikey_cookie",
+            "oauth2",
+            "openid_connect",
+            "mutual_tls",
+            "custom"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "scheme_id": {
+          "title": "Scheme Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scheme_id",
+        "kind"
+      ],
+      "title": "SecuritySchemeDecl",
+      "type": "object"
+    },
+    "Service": {
+      "additionalProperties": false,
+      "properties": {
+        "base_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Base Paths",
+          "type": "array"
+        },
+        "build_system": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Build System"
+        },
+        "dependencies": {
+          "items": {
+            "$ref": "#/$defs/DependencyEdge"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "description_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description Hint"
+        },
+        "endpoints": {
+          "items": {
+            "$ref": "#/$defs/Endpoint"
+          },
+          "title": "Endpoints",
+          "type": "array"
+        },
+        "framework": {
+          "title": "Framework",
+          "type": "string"
+        },
+        "framework_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Framework Version"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "language": {
+          "enum": [
+            "python",
+            "java"
+          ],
+          "title": "Language",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "root_path": {
+          "default": "",
+          "title": "Root Path",
+          "type": "string"
+        },
+        "security_schemes": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SecuritySchemeDecl"
+          },
+          "title": "Security Schemes",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "language",
+        "framework"
+      ],
+      "title": "Service",
+      "type": "object"
+    },
+    "UnresolvedContract": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "response_schema",
+            "request_schema",
+            "parameter_type",
+            "status_code",
+            "media_type",
+            "security",
+            "route_path"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "pointer": {
+          "title": "Pointer",
+          "type": "string"
+        },
+        "reason_code": {
+          "enum": [
+            "declared_annotation",
+            "declared_type",
+            "inferred_return_flow",
+            "inferred_serializer",
+            "dynamic_type",
+            "unresolved_symbol",
+            "generated_code",
+            "conditional_conflict",
+            "framework_default",
+            "parse_error_partial",
+            "sidecar_unavailable"
+          ],
+          "title": "Reason Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "pointer",
+        "kind",
+        "reason_code"
+      ],
+      "title": "UnresolvedContract",
+      "type": "object"
+    }
+  },
+  "$id": "https://openapi-agent.dev/schemas/metadata-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "coverage": {
+      "$ref": "#/$defs/CoverageMetrics"
+    },
+    "generator": {
+      "$ref": "#/$defs/GeneratorInfo"
+    },
+    "metadata_version": {
+      "title": "Metadata Version",
+      "type": "string"
+    },
+    "repo": {
+      "$ref": "#/$defs/RepoInfo"
+    },
+    "schema_registry": {
+      "$ref": "#/$defs/SchemaRegistry"
+    },
+    "schema_uri": {
+      "default": "https://openapi-agent.dev/schemas/metadata-v1.schema.json",
+      "title": "Schema Uri",
+      "type": "string"
+    },
+    "services": {
+      "items": {
+        "$ref": "#/$defs/Service"
+      },
+      "title": "Services",
+      "type": "array"
+    },
+    "unresolved": {
+      "items": {
+        "$ref": "#/$defs/UnresolvedContract"
+      },
+      "title": "Unresolved",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/AnalysisWarning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "metadata_version",
+    "generator",
+    "repo"
+  ],
+  "title": "MetadataDocument",
+  "type": "object"
+}

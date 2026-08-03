@@ -1,0 +1,255 @@
+{
+  "generated_by": "openapi-agent",
+  "metadata_path": "output\\api_metadata.json",
+  "strict_mode": false,
+  "strict_ok": true,
+  "llm_provider": "gemini",
+  "extractors_complete": false,
+  "production_ready": true,
+  "services": [
+    {
+      "service_id": "services-budget-service",
+      "spec_path": "output\\openapi.services-budget-service.yaml",
+      "endpoints": 6,
+      "operations": 9,
+      "request_completeness": 1.0,
+      "response_completeness": 1.0,
+      "parameter_completeness": 1.0,
+      "confidence_counts": {
+        "high": 29,
+        "medium": 7,
+        "low": 0
+      },
+      "unresolved_count": 0,
+      "operations_with_security": 8,
+      "validation_errors": 0,
+      "validation_warnings": 1,
+      "gates": {
+        "unique_operation_ids": true,
+        "path_params_declared": true,
+        "valid_status_keys": true,
+        "endpoint_coverage": true,
+        "no_invented_operations": true,
+        "no_invented_details": true
+      },
+      "llm_failures": 0,
+      "readiness_score": 98.1,
+      "production_ready": true,
+      "blocking_issues": []
+    },
+    {
+      "service_id": "services-category-service",
+      "spec_path": "output\\openapi.services-category-service.yaml",
+      "endpoints": 4,
+      "operations": 7,
+      "request_completeness": 1.0,
+      "response_completeness": 1.0,
+      "parameter_completeness": 1.0,
+      "confidence_counts": {
+        "high": 16,
+        "medium": 10,
+        "low": 0
+      },
+      "unresolved_count": 0,
+      "operations_with_security": 5,
+      "validation_errors": 0,
+      "validation_warnings": 1,
+      "gates": {
+        "unique_operation_ids": true,
+        "path_params_declared": true,
+        "valid_status_keys": true,
+        "endpoint_coverage": true,
+        "no_invented_operations": true,
+        "no_invented_details": true
+      },
+      "llm_failures": 0,
+      "readiness_score": 96.2,
+      "production_ready": true,
+      "blocking_issues": []
+    },
+    {
+      "service_id": "services-expense-service",
+      "spec_path": "output\\openapi.services-expense-service.yaml",
+      "endpoints": 11,
+      "operations": 17,
+      "request_completeness": 1.0,
+      "response_completeness": 1.0,
+      "parameter_completeness": 1.0,
+      "confidence_counts": {
+        "high": 57,
+        "medium": 26,
+        "low": 0
+      },
+      "unresolved_count": 0,
+      "operations_with_security": 16,
+      "validation_errors": 0,
+      "validation_warnings": 1,
+      "gates": {
+        "unique_operation_ids": true,
+        "path_params_declared": true,
+        "valid_status_keys": true,
+        "endpoint_coverage": true,
+        "no_invented_operations": true,
+        "no_invented_details": true
+      },
+      "llm_failures": 0,
+      "readiness_score": 96.9,
+      "production_ready": true,
+      "blocking_issues": []
+    },
+    {
+      "service_id": "services-income-service",
+      "spec_path": "output\\openapi.services-income-service.yaml",
+      "endpoints": 4,
+      "operations": 8,
+      "request_completeness": 1.0,
+      "response_completeness": 1.0,
+      "parameter_completeness": 1.0,
+      "confidence_counts": {
+        "high": 33,
+        "medium": 16,
+        "low": 0
+      },
+      "unresolved_count": 0,
+      "operations_with_security": 8,
+      "validation_errors": 0,
+      "validation_warnings": 1,
+      "gates": {
+        "unique_operation_ids": true,
+        "path_params_declared": true,
+        "valid_status_keys": true,
+        "endpoint_coverage": true,
+        "no_invented_operations": true,
+        "no_invented_details": true
+      },
+      "llm_failures": 0,
+      "readiness_score": 96.7,
+      "production_ready": true,
+      "blocking_issues": []
+    },
+    {
+      "service_id": "services-notification-service",
+      "spec_path": "output\\openapi.services-notification-service.yaml",
+      "endpoints": 4,
+      "operations": 4,
+      "request_completeness": 1.0,
+      "response_completeness": 1.0,
+      "parameter_completeness": 1.0,
+      "confidence_counts": {
+        "high": 11,
+        "medium": 2,
+        "low": 0
+      },
+      "unresolved_count": 0,
+      "operations_with_security": 4,
+      "validation_errors": 0,
+      "validation_warnings": 1,
+      "gates": {
+        "unique_operation_ids": true,
+        "path_params_declared": true,
+        "valid_status_keys": true,
+        "endpoint_coverage": true,
+        "no_invented_operations": true,
+        "no_invented_details": true
+      },
+      "llm_failures": 0,
+      "readiness_score": 98.5,
+      "production_ready": true,
+      "blocking_issues": []
+    },
+    {
+      "service_id": "services-reporting-service",
+      "spec_path": "output\\openapi.services-reporting-service.yaml",
+      "endpoints": 5,
+      "operations": 5,
+      "request_completeness": 1.0,
+      "response_completeness": 1.0,
+      "parameter_completeness": 1.0,
+      "confidence_counts": {
+        "high": 19,
+        "medium": 5,
+        "low": 1
+      },
+      "unresolved_count": 0,
+      "operations_with_security": 5,
+      "validation_errors": 0,
+      "validation_warnings": 1,
+      "gates": {
+        "unique_operation_ids": true,
+        "path_params_declared": true,
+        "valid_status_keys": true,
+        "endpoint_coverage": true,
+        "no_invented_operations": true,
+        "no_invented_details": true
+      },
+      "llm_failures": 0,
+      "readiness_score": 97.2,
+      "production_ready": true,
+      "blocking_issues": []
+    },
+    {
+      "service_id": "services-savings-goal-service",
+      "spec_path": "output\\openapi.services-savings-goal-service.yaml",
+      "endpoints": 5,
+      "operations": 9,
+      "request_completeness": 1.0,
+      "response_completeness": 1.0,
+      "parameter_completeness": 1.0,
+      "confidence_counts": {
+        "high": 28,
+        "medium": 18,
+        "low": 0
+      },
+      "unresolved_count": 0,
+      "operations_with_security": 8,
+      "validation_errors": 0,
+      "validation_warnings": 1,
+      "gates": {
+        "unique_operation_ids": true,
+        "path_params_declared": true,
+        "valid_status_keys": true,
+        "endpoint_coverage": true,
+        "no_invented_operations": true,
+        "no_invented_details": true
+      },
+      "llm_failures": 0,
+      "readiness_score": 96.1,
+      "production_ready": true,
+      "blocking_issues": []
+    },
+    {
+      "service_id": "services-user-service",
+      "spec_path": "output\\openapi.services-user-service.yaml",
+      "endpoints": 12,
+      "operations": 14,
+      "request_completeness": 1.0,
+      "response_completeness": 1.0,
+      "parameter_completeness": 1.0,
+      "confidence_counts": {
+        "high": 31,
+        "medium": 20,
+        "low": 0
+      },
+      "unresolved_count": 0,
+      "operations_with_security": 6,
+      "validation_errors": 0,
+      "validation_warnings": 1,
+      "gates": {
+        "unique_operation_ids": true,
+        "path_params_declared": true,
+        "valid_status_keys": true,
+        "endpoint_coverage": true,
+        "no_invented_operations": true,
+        "no_invented_details": true
+      },
+      "llm_failures": 0,
+      "readiness_score": 96.1,
+      "production_ready": true,
+      "blocking_issues": []
+    }
+  ],
+  "warnings": [
+    "W401: JVM sidecar unavailable (sidecar JAR not found at tools\\java-sidecar\\target\\openapi-agent-sidecar.jar (build it: cd tools/java-sidecar && mvnw package)); tree-sitter-only extraction, affected contracts marked reduced confidence"
+  ],
+  "overall_readiness": 97.0
+}

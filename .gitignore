@@ -1,0 +1,31 @@
+# Secrets & local env
+.env
+
+# Generated OpenAPI documents are committed intentionally (output/ is tracked).
+# LLM response cache stays local.
+.llm_cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Java sidecar build artifacts
+tools/java-sidecar/target/
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

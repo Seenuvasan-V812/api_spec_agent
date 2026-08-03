@@ -1,0 +1,617 @@
+openapi: 3.1.0
+info:
+  title: Spendora Service API - budget-service
+  version: 1.0.0
+  description: The budget-service API provides comprehensive operations for managing the lifecycle of budgets, including creation, retrieval, updates, and deletion. It includes specialized endpoints for handling budget activation, rollovers, and status checks. Additionally, the service provides internal functionality to export data for specific users.
+  contact:
+    name: API Support
+    url: https://example.com/support
+  license:
+    name: Proprietary
+servers:
+- url: http://localhost:8080
+paths:
+  /api/v1/budgets:
+    get:
+      operationId: getBudgets
+      tags:
+      - budget
+      summary: List budgets
+      parameters:
+      - name: active
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Filter budgets by active status.
+      - name: page
+        in: query
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        description: Specify the page number for pagination.
+      - name: size
+        in: query
+        required: false
+        schema:
+          default: 20
+          format: int32
+          type: integer
+        description: Specify the number of items per page.
+      responses:
+        '200':
+          description: Returns a list of budgets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse_BudgetResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    post:
+      operationId: postBudgets
+      tags:
+      - budget
+      summary: Create a new budget
+      description: Create a budget by providing a CreateBudgetRequest.
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        schema:
+          type: string
+        description: The authorization header for the request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetRequest'
+        required: true
+        description: Provide a CreateBudgetRequest in the request body.
+      responses:
+        '201':
+          description: The budget was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponse'
+          headers:
+            Location:
+              schema:
+                format: uri
+                type: string
+              required: true
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: A BusinessConflictException occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/budgets/{id}:
+    get:
+      operationId: getBudgetsById
+      tags:
+      - budget
+      summary: Retrieve a budget by its ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the budget.
+      responses:
+        '200':
+          description: The budget was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    put:
+      operationId: putBudgetsById
+      tags:
+      - budget
+      summary: Update a budget
+      description: Update the budget details using the UpdateBudgetRequest.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the budget.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetRequest'
+        required: true
+        description: Provide the update details in an UpdateBudgetRequest.
+      responses:
+        '200':
+          description: The budget was successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponse'
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: A business conflict occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: deleteBudgetsById
+      tags:
+      - budget
+      summary: Delete a budget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the budget to delete.
+      responses:
+        '204':
+          description: The budget was successfully deleted.
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/budgets/{id}/activation:
+    patch:
+      operationId: patchBudgetsByIdActivation
+      tags:
+      - budget
+      summary: Set the activation status of a budget
+      description: Update the activation state for the specified budget using an ActivationRequest.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The identifier of the budget.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivationRequest'
+        required: true
+        description: Provide an ActivationRequest in the request body.
+      responses:
+        '200':
+          description: The budget was successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponse'
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/budgets/{id}/rollover:
+    patch:
+      operationId: patchBudgetsByIdRollover
+      tags:
+      - budget
+      summary: Set the budget rollover
+      description: Update the rollover settings for the specified budget using a RolloverToggleRequest.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The identifier of the budget.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolloverToggleRequest'
+        required: true
+        description: A RolloverToggleRequest object.
+      responses:
+        '200':
+          description: The budget was successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponse'
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/budgets/{id}/status:
+    get:
+      operationId: getBudgetsByIdStatus
+      tags:
+      - budget
+      summary: Get the status of a budget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the budget.
+      responses:
+        '200':
+          description: Returns the budget status response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetStatusResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+tags:
+- name: budget
+components:
+  schemas:
+    ActivationRequest:
+      properties:
+        active:
+          type: boolean
+      required:
+      - active
+      type: object
+    BudgetResponse:
+      properties:
+        active:
+          type: boolean
+        budgetLimit:
+          type: number
+        categoryId:
+          format: uuid
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        currency:
+          type: string
+        id:
+          format: uuid
+          type: string
+        periodType:
+          $ref: '#/components/schemas/PeriodType'
+        rolloverEnabled:
+          type: boolean
+        scope:
+          $ref: '#/components/schemas/BudgetScope'
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: uuid
+          type: string
+      type: object
+    BudgetScope:
+      enum:
+      - OVERALL
+      - CATEGORY
+      type: string
+    BudgetStatusResponse:
+      properties:
+        budgetId:
+          format: uuid
+          type: string
+        budgetLimit:
+          type: number
+        carriedIn:
+          type: number
+        effectiveLimit:
+          type: number
+        firedEightyPercent:
+          type: boolean
+        firedExceeded:
+          type: boolean
+        ledgerId:
+          format: uuid
+          type: string
+        percentUsed:
+          type: number
+        periodEnd:
+          format: date
+          type: string
+        periodStart:
+          format: date
+          type: string
+        remaining:
+          type: number
+        spent:
+          type: number
+      type: object
+    CreateBudgetRequest:
+      properties:
+        budgetLimit:
+          minimum: 0.01
+          type: number
+        categoryId:
+          format: uuid
+          type: string
+        periodType:
+          pattern: ^(?:WEEKLY|MONTHLY)$
+          type: string
+        rolloverEnabled:
+          type: boolean
+        scope:
+          pattern: ^(?:OVERALL|CATEGORY)$
+          type: string
+      required:
+      - budgetLimit
+      - periodType
+      - scope
+      type: object
+    ErrorResponse:
+      description: 'Uniform error envelope — API-3. Serializes exactly: timestamp, status, error, message, path, traceId. The {@code message} field MUST carry zero PII (CQ-13).'
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        traceId:
+          type: string
+      type: object
+    PageResponse_BudgetResponse:
+      description: 'Uniform pagination envelope — API-2. Serializes exactly: content, page, size, totalElements, totalPages.'
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/BudgetResponse'
+          type: array
+        page:
+          format: int32
+          type: integer
+        size:
+          format: int32
+          type: integer
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      type: object
+    PeriodType:
+      enum:
+      - WEEKLY
+      - MONTHLY
+      type: string
+    RolloverToggleRequest:
+      properties:
+        rolloverEnabled:
+          type: boolean
+      required:
+      - rolloverEnabled
+      type: object
+    UpdateBudgetRequest:
+      properties:
+        budgetLimit:
+          minimum: 0.01
+          type: number
+      type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,7 @@
+services:
+  catalog:
+    build: ./catalog
+    ports: ["8001:8000"]
+  checkout:
+    build: ./checkout
+    ports: ["8002:8000"]

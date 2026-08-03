@@ -1,0 +1,31 @@
+# Run configuration (merged over .env, under CLI flags).
+# These are generic OpenAPI options — nothing here is repo-specific.
+
+openapi:
+  # Add conventional error responses (401/403 when secured, 404 for
+  # path-parameterized operations, and a referenced `default`) grounded in
+  # method + auth. Opt-in so the strict "emit only what is proven" default is
+  # preserved for callers who want it.
+  conventional_responses: true
+  annotate_low_confidence: true
+  # Paths that are service-internal (service-to-service / ops) and excluded
+  # from the public specification.
+  internal_path_prefixes:
+    - /internal
+    - /actuator
+  # info.contact / info.license (fill in with your real values).
+  contact:
+    name: API Support
+    url: https://example.com/support
+  license:
+    name: Proprietary
+
+quality:
+  min_response_completeness: 0.75
+  min_request_completeness: 0.75
+  min_parameter_completeness: 0.90
+  max_unresolved: 0
+  # Missing JVM sidecar marks output non-production but does not abort by
+  # default (set true in CI where the sidecar is mandatory).
+  require_extractors: false
+  fail_on_not_production: false

@@ -1,0 +1,1226 @@
+openapi: 3.1.0
+info:
+  title: Spendora Service API - expense-service
+  version: 1.0.0
+  description: The expense-service API provides comprehensive management of expenses, recurring expenses, and organizational tags. It supports full CRUD operations for expenses, including CSV import and export functionality and secure receipt attachment handling. Additionally, the API provides endpoints for managing recurring costs and exporting internal user data.
+  contact:
+    name: API Support
+    url: https://example.com/support
+  license:
+    name: Proprietary
+servers:
+- url: http://localhost:8080
+paths:
+  /api/v1/expenses:
+    get:
+      operationId: getExpenses
+      tags:
+      - expense
+      summary: List expenses
+      parameters:
+      - name: categoryId
+        in: query
+        required: false
+        schema:
+          format: uuid
+          type: string
+        description: Filter by category ID.
+      - name: from
+        in: query
+        required: false
+        schema:
+          format: date
+          type: string
+        description: Filter by start date.
+      - name: page
+        in: query
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        description: The page number to retrieve.
+      - name: paymentMethod
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/PaymentMethod'
+        description: Filter by payment method.
+      - name: savingsGoalId
+        in: query
+        required: false
+        schema:
+          format: uuid
+          type: string
+        description: Filter by savings goal ID.
+      - name: size
+        in: query
+        required: false
+        schema:
+          default: 20
+          format: int32
+          type: integer
+        description: The number of items per page.
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          default: date
+          type: string
+        description: The field to sort by.
+      - name: sortDir
+        in: query
+        required: false
+        schema:
+          default: desc
+          type: string
+        description: The direction of the sort.
+      - name: tagId
+        in: query
+        required: false
+        schema:
+          format: uuid
+          type: string
+        description: Filter by tag ID.
+      - name: to
+        in: query
+        required: false
+        schema:
+          format: date
+          type: string
+        description: Filter by end date.
+      responses:
+        '200':
+          description: Returns a list of expenses.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse_ExpenseResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    post:
+      operationId: postExpenses
+      tags:
+      - expense
+      summary: Create a new expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseRequest'
+        required: true
+        description: Provide a CreateExpenseRequest object in JSON format.
+      responses:
+        '201':
+          description: The expense was successfully created.
+          headers:
+            Location:
+              schema:
+                format: uri
+                type: string
+              required: true
+        '400':
+          description: The request was invalid or failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/expenses/export:
+    get:
+      operationId: getExpensesExport
+      tags:
+      - expenses
+      - importexport
+      summary: Download a CSV export of expenses
+      description: Export expense data as a CSV file.
+      parameters:
+      - name: from
+        in: query
+        required: false
+        schema:
+          format: date
+          type: string
+        description: The start range for the export.
+      - name: to
+        in: query
+        required: false
+        schema:
+          format: date
+          type: string
+        description: The end range for the export.
+      responses:
+        '200':
+          description: The CSV file is returned successfully.
+          content:
+            text/csv:
+              schema:
+                format: binary
+                type: string
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/expenses/import:
+    post:
+      operationId: postExpensesImport
+      tags:
+      - importexport
+      - expenses
+      summary: Import expenses via multipart CSV upload
+      description: Upload a CSV file using multipart/form-data to import expenses.
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+        description: An optional header to ensure the request is processed only once.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  format: binary
+                  type: string
+              required:
+              - file
+              type: object
+        required: true
+        description: Submit a multipart/form-data request containing the file field.
+      responses:
+        '200':
+          description: Returns an ImportExpensesReport upon successful import.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportExpensesReport'
+        '400':
+          description: Returns an ErrorResponse when an IllegalArgumentException occurs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/expenses/{expenseId}/receipt:
+    get:
+      operationId: getExpensesByExpenseIdReceipt
+      tags:
+      - receipt
+      summary: Stream the receipt inline with secure headers
+      description: Download the receipt associated with the specified expense ID.
+      parameters:
+      - name: expenseId
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the expense.
+      responses:
+        '200':
+          description: The receipt is streamed successfully.
+          content:
+            application/octet-stream:
+              schema:
+                format: binary
+                type: string
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access is forbidden due to a ForbiddenOwnershipException.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    post:
+      operationId: postExpensesByExpenseIdReceipt
+      tags:
+      - receipt
+      summary: Upload a JPEG, PNG, or WEBP receipt image
+      description: The system checks magic bytes, strips EXIF data, and guards against pixel-flood attacks.
+      parameters:
+      - name: expenseId
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The identifier of the expense.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  format: binary
+                  type: string
+              required:
+              - file
+              type: object
+        required: true
+        description: Provide the file using multipart/form-data.
+      responses:
+        '201':
+          description: Receipt uploaded successfully.
+        '400':
+          description: Invalid argument provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Ownership forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Business conflict occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: deleteExpensesByExpenseIdReceipt
+      tags:
+      - receipt
+      summary: Delete the receipt row and storage object
+      description: The associated expense is retained.
+      parameters:
+      - name: expenseId
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The identifier of the expense.
+      responses:
+        '204':
+          description: The receipt was successfully deleted.
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: ForbiddenOwnershipException occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/expenses/{id}:
+    get:
+      operationId: getExpensesById
+      tags:
+      - expense
+      summary: Retrieve a specific expense by its ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the expense.
+      responses:
+        '200':
+          description: Returns the requested expense.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: The request is forbidden due to ownership restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    put:
+      operationId: putExpensesById
+      tags:
+      - expense
+      summary: Update an expense
+      description: Update the details of an existing expense using its unique identifier.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the expense.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExpenseRequest'
+        required: true
+        description: The UpdateExpenseRequest containing the updated expense details.
+      responses:
+        '200':
+          description: The expense was successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseResponse'
+        '400':
+          description: The request was invalid or failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access to the expense is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: deleteExpensesById
+      tags:
+      - expense
+      summary: Delete an expense
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the expense.
+      responses:
+        '204':
+          description: The expense was successfully deleted.
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden ownership exception occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/recurring-expenses:
+    post:
+      operationId: postRecurringExpenses
+      tags:
+      - recurring-expenses
+      summary: Create a recurring expense
+      description: Submit a CreateRecurringExpenseRequest to establish a new recurring expense.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecurringExpenseRequest'
+        required: true
+        description: Provide a CreateRecurringExpenseRequest in JSON format.
+      responses:
+        '201':
+          description: The recurring expense was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringExpenseResponse'
+          headers:
+            Location:
+              schema:
+                format: uri
+                type: string
+              required: true
+        '400':
+          description: The request was invalid or failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/recurring-expenses/{expenseId}:
+    put:
+      operationId: putRecurringExpensesByExpenseId
+      tags:
+      - recurring-expenses
+      summary: Edit a specified occurrence Expense
+      description: Set scope to THIS to update only the specified occurrence Expense.
+      parameters:
+      - name: expenseId
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the expense.
+      - name: scope
+        in: query
+        required: false
+        schema:
+          default: THIS
+          type: string
+        description: The scope for the update operation.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecurringExpenseRequest'
+        required: true
+        description: The request body must be a CreateRecurringExpenseRequest.
+      responses:
+        '200':
+          description: The request was successful.
+        '400':
+          description: The request contained an illegal argument or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: The request was forbidden due to ownership restrictions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/recurring-expenses/{id}:
+    get:
+      operationId: getRecurringExpensesById
+      tags:
+      - recurring-expenses
+      summary: Retrieve a recurring expense by its ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the recurring expense.
+      responses:
+        '200':
+          description: The recurring expense was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringExpenseResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/tags:
+    post:
+      operationId: postTags
+      tags:
+      - tag
+      summary: Create a new tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequest'
+        required: true
+        description: Provide a CreateTagRequest object.
+      responses:
+        '201':
+          description: The tag was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+          headers:
+            Location:
+              schema:
+                format: uri
+                type: string
+              required: true
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: A business conflict occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/tags/{id}:
+    get:
+      operationId: getTagsById
+      tags:
+      - tag
+      summary: Retrieve a tag by its ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The ID of the tag to retrieve.
+      responses:
+        '200':
+          description: Returns the requested tag.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: deleteTagsById
+      tags:
+      - tag
+      summary: Delete a tag
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The unique identifier of the tag to delete.
+      responses:
+        '204':
+          description: The tag was successfully deleted.
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+tags:
+- name: expense
+- name: expenses
+- name: importexport
+- name: receipt
+- name: recurring-expenses
+- name: tag
+components:
+  schemas:
+    CreateExpenseRequest:
+      description: T054 — Create expense request DTO. amount>0 validated in ExpenseService (IllegalArgumentException→400).
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        categoryId:
+          format: uuid
+          type: string
+        date:
+          format: date
+          type: string
+        description:
+          type: string
+        merchant:
+          type: string
+        notes:
+          type: string
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        savingsGoalId:
+          format: uuid
+          type: string
+        tagIds:
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - amount
+      - categoryId
+      - date
+      - paymentMethod
+      type: object
+    CreateRecurringExpenseRequest:
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        anchorDate:
+          format: date
+          type: string
+        categoryId:
+          format: uuid
+          type: string
+        description:
+          type: string
+        endDate:
+          format: date
+          type: string
+        frequency:
+          $ref: '#/components/schemas/RecurringFrequency'
+        maxOccurrences:
+          format: int32
+          type: integer
+        merchant:
+          type: string
+        notes:
+          type: string
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        tagIds:
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - amount
+      - anchorDate
+      - categoryId
+      - frequency
+      - paymentMethod
+      type: object
+    CreateTagRequest:
+      properties:
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+      required:
+      - name
+      type: object
+    ErrorResponse:
+      description: 'Uniform error envelope — API-3. Serializes exactly: timestamp, status, error, message, path, traceId. The {@code message} field MUST carry zero PII (CQ-13).'
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        traceId:
+          type: string
+      type: object
+    ExpenseResponse:
+      description: 'T054/T055 — Expense response DTO (AL-4: entity never serialized directly).'
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        categoryId:
+          format: uuid
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        date:
+          format: date
+          type: string
+        description:
+          type: string
+        expenseId:
+          format: uuid
+          type: string
+        hasReceipt:
+          type: boolean
+        merchant:
+          type: string
+        notes:
+          type: string
+        paymentMethod:
+          type: string
+        recurringExpenseId:
+          format: uuid
+          type: string
+        savingsGoalId:
+          format: uuid
+          type: string
+        tags:
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+        updatedAt:
+          format: date-time
+          type: string
+      type: object
+    ImportExpensesReport:
+      properties:
+        failed:
+          format: int32
+          type: integer
+        results:
+          items:
+            $ref: '#/components/schemas/ImportRowResult'
+          type: array
+        succeeded:
+          format: int32
+          type: integer
+        succeededWithWarning:
+          format: int32
+          type: integer
+        totalRows:
+          format: int32
+          type: integer
+      type: object
+    ImportRowResult:
+      properties:
+        error:
+          type: string
+        row:
+          format: int32
+          type: integer
+        status:
+          type: string
+        warning:
+          type: string
+      type: object
+    MoneyDto:
+      description: Value object for monetary amounts. INR-only, scale-2, BigDecimal — never double/float (DB-5). Serializes amount as a JSON string "100.50" to avoid floating-point representation errors.
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+      type: object
+    PageResponse_ExpenseResponse:
+      description: 'Uniform pagination envelope — API-2. Serializes exactly: content, page, size, totalElements, totalPages.'
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/ExpenseResponse'
+          type: array
+        page:
+          format: int32
+          type: integer
+        size:
+          format: int32
+          type: integer
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      type: object
+    PaymentMethod:
+      description: Payment method options (REQ-EXP-001 / contract §4.1).
+      enum:
+      - UPI
+      - CASH
+      - CREDIT_CARD
+      - DEBIT_CARD
+      - NET_BANKING
+      - OTHER
+      type: string
+    RecurringExpenseResponse:
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        anchorDate:
+          format: date
+          type: string
+        categoryId:
+          format: uuid
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        description:
+          type: string
+        endDate:
+          format: date
+          type: string
+        frequency:
+          type: string
+        generatedCount:
+          format: int32
+          type: integer
+        maxOccurrences:
+          format: int32
+          type: integer
+        merchant:
+          type: string
+        nextRunDate:
+          format: date
+          type: string
+        notes:
+          type: string
+        paymentMethod:
+          type: string
+        recurringExpenseId:
+          format: uuid
+          type: string
+        tagIds:
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+        updatedAt:
+          format: date-time
+          type: string
+      type: object
+    RecurringFrequency:
+      enum:
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - YEARLY
+      type: string
+    TagResponse:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        name:
+          type: string
+        tagId:
+          format: uuid
+          type: string
+        userId:
+          format: uuid
+          type: string
+      type: object
+    UpdateExpenseRequest:
+      description: T056 — Update expense request DTO. When savingsGoalId is set, service enforces EXP-INV-5 (categoryId must be Savings Category).
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyDto'
+        categoryId:
+          format: uuid
+          type: string
+        date:
+          format: date
+          type: string
+        description:
+          type: string
+        merchant:
+          type: string
+        notes:
+          type: string
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        savingsGoalId:
+          format: uuid
+          type: string
+        tagIds:
+          items:
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+      required:
+      - amount
+      - categoryId
+      - date
+      - paymentMethod
+      type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

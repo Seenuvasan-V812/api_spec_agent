@@ -1,0 +1,661 @@
+openapi: 3.1.0
+info:
+  title: Spendora Service API - user-service
+  version: 1.0.0
+  description: The user-service API manages user authentication and account profiles. It provides endpoints for registration, secure login, password recovery, and email verification. Additionally, it allows users to manage their own profile information and request data exports.
+  contact:
+    name: API Support
+    url: https://example.com/support
+  license:
+    name: Proprietary
+servers:
+- url: http://localhost:8080
+paths:
+  /api/v1/auth/forgot-password:
+    post:
+      operationId: postAuthForgotPassword
+      tags:
+      - auth
+      summary: Request a password reset
+      description: Submit a ForgotPasswordRequest to initiate the password recovery process.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+        required: true
+        description: Provide a ForgotPasswordRequest.
+      responses:
+        '202':
+          description: Request accepted.
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/login:
+    post:
+      operationId: postAuthLogin
+      tags:
+      - auth
+      summary: Log in to the system
+      description: Submit a LoginRequest to receive an AuthTokenResponse.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+        description: Provide a LoginRequest.
+      responses:
+        '200':
+          description: Returns an AuthTokenResponse.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/logout:
+    post:
+      operationId: postAuthLogout
+      tags:
+      - auth
+      summary: Log out of the system
+      description: Submit a LogoutRequest to terminate the session.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+        description: Provide a LogoutRequest in the request body.
+      responses:
+        '204':
+          description: Request processed successfully.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/refresh:
+    post:
+      operationId: postAuthRefresh
+      tags:
+      - auth
+      summary: Refresh the authentication token
+      description: Submit a RefreshRequest to obtain a new AuthTokenResponse.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        description: Provide a RefreshRequest in JSON format.
+      responses:
+        '200':
+          description: Returns an AuthTokenResponse.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/register:
+    post:
+      operationId: postAuthRegister
+      tags:
+      - auth
+      summary: Register a new user
+      description: Submit a RegisterRequest to create a new account.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+        description: Provide a RegisterRequest in JSON format.
+      responses:
+        '201':
+          description: The user was successfully registered.
+          headers:
+            Location:
+              schema:
+                format: uri
+                type: string
+              required: true
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: A business conflict occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/reset-password:
+    post:
+      operationId: postAuthResetPassword
+      tags:
+      - auth
+      summary: Reset the password
+      description: Submit a ResetPasswordRequest to reset the password.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+        required: true
+        description: Provide a ResetPasswordRequest in JSON format.
+      responses:
+        '204':
+          description: The password was successfully reset.
+        '400':
+          description: The request was invalid or failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/verify-email:
+    get:
+      operationId: getAuthVerifyEmail
+      tags:
+      - auth
+      summary: Verify the email address
+      description: Verify a user's email address using the provided token.
+      parameters:
+      - name: token
+        in: query
+        required: true
+        schema:
+          type: string
+        description: The verification token.
+      responses:
+        '200':
+          description: The email was successfully verified.
+        '409':
+          description: A business conflict occurred during verification.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/verify-email/by-email:
+    post:
+      operationId: postAuthVerifyEmailByEmail
+      tags:
+      - auth
+      summary: Resend email verification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyByEmailRequest'
+        required: true
+        description: Provide a VerifyByEmailRequest.
+      responses:
+        '202':
+          description: Request accepted.
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/users/me:
+    get:
+      operationId: getUsersMe
+      tags:
+      - user
+      summary: Retrieve the current user profile
+      responses:
+        '200':
+          description: Returns the UserResponse.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    put:
+      operationId: putUsersMe
+      tags:
+      - user
+      summary: Update your profile
+      description: Update the profile details for the authenticated user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+        required: true
+        description: Provide an UpdateProfileRequest in JSON format.
+      responses:
+        '200':
+          description: The profile was successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: deleteUsersMe
+      tags:
+      - user
+      summary: Delete the current user account
+      responses:
+        '204':
+          description: The account was successfully deleted.
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/users/me/data-export:
+    post:
+      operationId: postUsersMeDataExport
+      tags:
+      - user
+      summary: Request a data export
+      responses:
+        '202':
+          description: The data export request has been accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExportResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/users/me/data-export/{id}/download:
+    get:
+      operationId: getUsersMeDataExportByIdDownload
+      tags:
+      - user
+      - data-export
+      summary: Download a data export
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          format: uuid
+          type: string
+        description: The identifier of the data export.
+      responses:
+        '200':
+          description: The data export was successfully downloaded.
+          content:
+            application/json:
+              schema:
+                type: string
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Access is forbidden due to a ForbiddenOwnershipException.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+  /api/v1/users/me/password:
+    patch:
+      operationId: patchUsersMePassword
+      tags:
+      - user
+      summary: Change your password
+      description: Update the password for the authenticated user using a ChangePasswordRequest.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+        description: Provide a ChangePasswordRequest in JSON format.
+      responses:
+        '204':
+          description: Password changed successfully.
+        '400':
+          description: Invalid request or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+tags:
+- name: auth
+- name: data-export
+- name: user
+components:
+  schemas:
+    AuthTokenResponse:
+      properties:
+        accessToken:
+          type: string
+        expiresInSec:
+          format: int64
+          type: integer
+        refreshToken:
+          type: string
+      type: object
+    ChangePasswordRequest:
+      properties:
+        currentPassword:
+          minLength: 1
+          type: string
+        newPassword:
+          maxLength: 100
+          minLength: 8
+          type: string
+      required:
+      - currentPassword
+      - newPassword
+      type: object
+    DataExportResponse:
+      properties:
+        exportId:
+          format: uuid
+          type: string
+        status:
+          type: string
+      type: object
+    ErrorResponse:
+      description: 'Uniform error envelope — API-3. Serializes exactly: timestamp, status, error, message, path, traceId. The {@code message} field MUST carry zero PII (CQ-13).'
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        traceId:
+          type: string
+      type: object
+    ForgotPasswordRequest:
+      properties:
+        email:
+          format: email
+          minLength: 1
+          type: string
+      required:
+      - email
+      type: object
+    LoginRequest:
+      properties:
+        email:
+          format: email
+          minLength: 1
+          type: string
+        password:
+          minLength: 1
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    LogoutRequest:
+      properties:
+        refreshToken:
+          minLength: 1
+          type: string
+      required:
+      - refreshToken
+      type: object
+    RefreshRequest:
+      properties:
+        refreshToken:
+          minLength: 1
+          type: string
+      required:
+      - refreshToken
+      type: object
+    RegisterRequest:
+      properties:
+        email:
+          format: email
+          maxLength: 255
+          minLength: 1
+          type: string
+        fullName:
+          maxLength: 100
+          minLength: 1
+          type: string
+        password:
+          maxLength: 100
+          minLength: 8
+          type: string
+      required:
+      - email
+      - fullName
+      - password
+      type: object
+    ResetPasswordRequest:
+      properties:
+        newPassword:
+          maxLength: 100
+          minLength: 8
+          type: string
+        token:
+          minLength: 1
+          type: string
+      required:
+      - newPassword
+      - token
+      type: object
+    UpdateProfileRequest:
+      properties:
+        fullName:
+          maxLength: 100
+          minLength: 1
+          type: string
+        locale:
+          maxLength: 10
+          type: string
+        timezone:
+          maxLength: 50
+          type: string
+        weeklyDigestEnabled:
+          type: boolean
+      required:
+      - fullName
+      type: object
+    UserResponse:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        locale:
+          type: string
+        preferredCurrency:
+          type: string
+        status:
+          type: string
+        timezone:
+          type: string
+        userId:
+          format: uuid
+          type: string
+        weeklyDigestEnabled:
+          type: boolean
+      type: object
+    VerifyByEmailRequest:
+      properties:
+        email:
+          format: email
+          minLength: 1
+          type: string
+      required:
+      - email
+      type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
